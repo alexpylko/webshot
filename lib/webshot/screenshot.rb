@@ -1,4 +1,5 @@
 require "singleton"
+require "timeout"
 
 module Webshot
   class Screenshot
@@ -32,12 +33,19 @@ module Webshot
       false
     end
 
+    def wait_until
+      Timeout.timeout(Capybara.default_wait_time) do
+        sleep(0.1) until value = yield
+        value
+      end
+    end
+
     # Captures a screenshot of +url+ saving it to +path+.
     def capture(url, path, opts = {})
       begin
         # Default settings
-        width   = opts.fetch(:width, 120)
-        height  = opts.fetch(:height, 90)
+        width   = opts.fetch(:width, Webshot.width)
+        height  = opts.fetch(:height, Webshot.height)
         gravity = opts.fetch(:gravity, "north")
         quality = opts.fetch(:quality, 85)
         full = opts.fetch(:full, true)
@@ -48,11 +56,17 @@ module Webshot
         Capybara.reset_sessions! unless @session_started
         @session_started = false
 
+        # Browser settings
+        page.driver.resize(width, height)
+        sleep 0.1
+
         # Open page
         visit url
 
         # Timeout
-        sleep opts[:timeout] if opts[:timeout]
+        wait_until do
+          valid_status_code?(page.driver.status_code.to_i, allowed_status_codes)
+        end
 
         # Check response code
         status_code = page.driver.status_code.to_i
