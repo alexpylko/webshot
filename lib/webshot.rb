@@ -26,6 +26,10 @@ module Webshot
   mattr_accessor :timeout
   @@timeout = 300
 
+  # A custom path to the phantomjs executable
+  mattr_accessor :phantomjs
+  @@phantomjs = nil
+
   # Customize settings
   def self.setup
     yield self
@@ -42,6 +46,7 @@ module Webshot
         # Raise JavaScript errors to Ruby
         js_errors: false,
         timeout: @@timeout,
+        phantomjs: @@phantomjs,
         # Additional command line options for PhantomJS
         phantomjs_options: ['--ignore-ssl-errors=yes', '--ssl-protocol=any']
       })
