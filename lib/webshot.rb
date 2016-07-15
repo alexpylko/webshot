@@ -48,7 +48,7 @@ module Webshot
         timeout: @@timeout,
         phantomjs: @@phantomjs,
         # Additional command line options for PhantomJS
-        phantomjs_options: ['--ignore-ssl-errors=yes', '--ssl-protocol=any']
+        phantomjs_options: ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--disk-cache=true']
       })
     end
     Capybara.current_driver = :poltergeist
